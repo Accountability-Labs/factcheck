@@ -4,6 +4,7 @@ import (
 	"errors"
 	"factcheck/internal/database"
 	"net/http"
+	"syscall"
 )
 
 const (
@@ -13,6 +14,7 @@ const (
 var (
 	errNoBearerHeader = errors.New("no authentication header")
 	errInvalidAPIKey  = errors.New("invalid API key")
+	errTalkingToDB    = errors.New("error talking to database")
 )
 
 type authHandler func(w http.ResponseWriter, r *http.Request, user *database.User)
@@ -27,9 +29,11 @@ func (c *apiConfig) authenticate(handler authHandler) http.HandlerFunc {
 		}
 
 		user, err := c.DB.GetUserByAPIKey(r.Context(), apiKey)
-		if err != nil {
-			l.Printf("Error retrieving user by API key: %v", err)
-			http.Error(w, errInvalidAPIKey.Error(), http.StatusUnauthorized)
+		if errors.Is(err, syscall.ECONNREFUSED) {
+			logAndReturn(w, http.StatusServiceUnavailable, errTalkingToDB, err)
+			return
+		} else if err != nil {
+			logAndReturn(w, http.StatusUnauthorized, errInvalidAPIKey, err)
 			return
 		}
 
