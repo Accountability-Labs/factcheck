@@ -69,14 +69,16 @@ func main() {
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodOptions},
-		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedOrigins:   []string{"*"},
 		AllowedHeaders:   []string{"*"},
-		AllowCredentials: false,
+		AllowCredentials: true,
+		Debug:            true,
 	}))
 	router.Use(middleware.Logger)
+
+	// Unauthenticated endpoints.
 	router.Get("/", apiCfg.getIndex)
 	router.Post("/user", apiCfg.createUserHandler)
-
 	// Authenticated endpoints.
 	router.Post("/note", apiCfg.authenticate(apiCfg.createNoteHandler))
 	router.Post("/notes", apiCfg.authenticate(apiCfg.getRecentNNotesForUrl))
