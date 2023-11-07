@@ -13,4 +13,6 @@ WHERE id = $1
 RETURNING *;
 
 -- name: GetRecentNNotesForUrl :many
-SELECT * FROM notes WHERE url = $1 ORDER BY created_at DESC LIMIT $2;
+SELECT users.email, notes.* FROM notes
+JOIN users ON notes.created_by = users.id
+WHERE url = $1 ORDER BY users.created_at DESC LIMIT $2;
