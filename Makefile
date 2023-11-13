@@ -1,5 +1,5 @@
 svc = factcheck
-deps = *.go go.mod go.sum Makefile
+deps = *.go go.mod go.sum Makefile internal/database/*.go
 
 $(svc): $(deps)
 	go build -o $(svc)
