@@ -83,8 +83,9 @@ func (c *apiConfig) getRecentNNotesForUrl(w http.ResponseWriter, r *http.Request
 	// TODO
 
 	notes, err := c.DB.GetRecentNNotesForUrl(r.Context(), database.GetRecentNNotesForUrlParams{
-		Url:   params.Url,
-		Limit: 5,
+		VotedBy: user.ID,
+		Url:     params.Url,
+		Limit:   5,
 	})
 	if err != nil {
 		logAndReturn(w, http.StatusInternalServerError, errTalkingToDb, err)
