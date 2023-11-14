@@ -23,7 +23,8 @@ func (c *apiConfig) getProfile(w http.ResponseWriter, r *http.Request, user *dat
 
 func (c *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) {
 	params := struct {
-		Email string `json:"email"`
+		UserName string `json:"user_name"`
+		Email    string `json:"email"`
 	}{}
 
 	if err := marshalBodyInto(r.Body, &params); err != nil {
@@ -35,7 +36,10 @@ func (c *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := c.DB.CreateUser(r.Context(), params.Email)
+	user, err := c.DB.CreateUser(r.Context(), database.CreateUserParams{
+		Email:    params.Email,
+		UserName: params.UserName,
+	})
 	if err != nil {
 		logAndReturn(w, http.StatusInternalServerError, errTalkingToDb, err)
 		return

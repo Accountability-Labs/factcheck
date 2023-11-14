@@ -7,6 +7,7 @@ CREATE TABLE users (
     api_key VARCHAR(64) UNIQUE NOT NULL DEFAULT (
         encode(sha256(random()::text::bytea), 'hex')
     ),
+    user_name TEXT NOT NULL,
     email TEXT NOT NULL
 );
 
