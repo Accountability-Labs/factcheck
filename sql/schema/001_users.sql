@@ -20,9 +20,9 @@ CREATE TABLE notes (
 );
 
 CREATE TABLE votes (
-    id SERIAL PRIMARY KEY,
     voted_by INTEGER NOT NULL REFERENCES users(id),
     voted_on INTEGER NOT NULL REFERENCES notes(id),
+    PRIMARY KEY (voted_by, voted_on),
     created_at TIMESTAMP NOT NULL,
     vote INTEGER NOT NULL
 );
