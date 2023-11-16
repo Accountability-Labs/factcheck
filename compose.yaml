@@ -1,0 +1,8 @@
+services:
+  svc:
+    environment:
+      - DB_URL
+      - ADDR
+    build: .
+    ports:
+      - "8080:8080"
