@@ -7,7 +7,19 @@ import (
 )
 
 func logAndReturn(w http.ResponseWriter, code int, clientError, logError error) {
-	http.Error(w, clientError.Error(), code)
+	// In case of an error, the extension expects a JSON object containing an
+	// "error" attribute.
+	jsonBlob, err := json.Marshal(struct {
+		Error string `json:"error"`
+	}{
+		Error: clientError.Error(),
+	})
+	if err != nil {
+		http.Error(w, `{"error": "failed to marshal error string"}`, http.StatusInternalServerError)
+		return
+	}
+
+	http.Error(w, string(jsonBlob), code)
 	if logError == nil {
 		l.Print(clientError)
 	} else {
