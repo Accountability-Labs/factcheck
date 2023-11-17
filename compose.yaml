@@ -1,8 +1,11 @@
 services:
-  svc:
+  factcheck:
     environment:
       - DB_URL
       - ADDR
     build: .
     ports:
       - "8080:8080"
+    extra_hosts:
+      # Allow the service to talk to the external database.
+      - "host.docker.internal:host-gateway"
