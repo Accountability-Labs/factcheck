@@ -27,6 +27,13 @@ func (c *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) {
 		Email    string `json:"email"`
 	}{}
 
+	// Make sure that the request contains the bearer token that authenticates
+	// it as coming from auth0's infrastructure.
+	if err := hasAuth0BearerToken(r, c.BearerToken); err != nil {
+		logAndReturn(w, http.StatusUnauthorized, err, err)
+		return
+	}
+
 	if err := marshalBodyInto(r.Body, &params); err != nil {
 		logAndReturn(w, http.StatusBadRequest, errReadingJSONBody, err)
 		return

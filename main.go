@@ -18,17 +18,20 @@ import (
 var (
 	l = log.New(os.Stderr, "factcheck: ", log.Ldate|log.Ltime|log.LUTC|log.Lshortfile)
 
-	errNoAddrVar = errors.New("environment variable ADDR unset")
-	errNoDbVar   = errors.New("environment variable DB_URL unset")
+	errNoAddrVar   = errors.New("environment variable ADDR unset")
+	errNoDbVar     = errors.New("environment variable DB_URL unset")
+	errNoBearerVar = errors.New("environment variable AUTH0_BEARER_TOKEN unset")
 )
 
 type apiConfig struct {
-	DB *database.Queries
+	DB          *database.Queries
+	BearerToken string
 }
 
 type config struct {
-	Addr  string
-	DbURL string
+	Addr        string
+	DbURL       string
+	BearerToken string
 }
 
 func loadEnvVars() (*config, error) {
@@ -45,6 +48,12 @@ func loadEnvVars() (*config, error) {
 		return nil, errNoDbVar
 	}
 	c.DbURL = envDbURL
+
+	bearerToken, exists := os.LookupEnv("AUTH0_BEARER_TOKEN")
+	if !exists {
+		return nil, errNoBearerVar
+	}
+	c.BearerToken = bearerToken
 
 	return c, nil
 }
@@ -63,7 +72,8 @@ func main() {
 	l.Println("Established database connection.")
 
 	apiCfg := apiConfig{
-		DB: database.New(conn),
+		DB:          database.New(conn),
+		BearerToken: envCfg.BearerToken,
 	}
 
 	router := chi.NewRouter()
