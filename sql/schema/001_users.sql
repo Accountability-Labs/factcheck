@@ -7,8 +7,10 @@ CREATE TABLE users (
     api_key VARCHAR(64) UNIQUE NOT NULL DEFAULT (
         encode(sha256(random()::text::bytea), 'hex')
     ),
-    user_name TEXT NOT NULL,
-    email TEXT NOT NULL
+    user_name TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash VARCHAR(64) UNIQUE NOT NULL,
+    salt VARCHAR(32) UNIQUE NOT NULL
 );
 
 CREATE TABLE notes (
