@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"strconv"
 
 	"golang.org/x/crypto/scrypt"
 )
@@ -15,14 +14,6 @@ const (
 	r       = 8
 	p       = 1
 )
-
-func isValidPort(portStr string) bool {
-	maybePort, err := strconv.ParseInt(portStr, 10, 32)
-	if err != nil {
-		return false
-	}
-	return maybePort > 0 && maybePort <= 65535
-}
 
 func hashPwdWithSalt(pwd, salt string) (string, error) {
 	rawSalt, err := hex.DecodeString(salt)
