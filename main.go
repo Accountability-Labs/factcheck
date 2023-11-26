@@ -32,10 +32,16 @@ type config struct {
 	Addr        string
 	DbURL       string
 	BearerToken string
+	Debug       bool
 }
 
 func loadEnvVars() (*config, error) {
 	var c = new(config)
+
+	envDebug, exists := os.LookupEnv("DEBUG")
+	if exists && envDebug == "true" {
+		c.Debug = true
+	}
 
 	envAddr, exists := os.LookupEnv("ADDR")
 	if !exists {
@@ -82,7 +88,7 @@ func main() {
 		AllowedOrigins:   []string{"*"},
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,
-		Debug:            true,
+		Debug:            envCfg.Debug,
 	}))
 	router.Use(middleware.Logger)
 
