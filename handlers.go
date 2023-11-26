@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
 	"factcheck/internal/database"
 	"net/http"
@@ -8,9 +9,11 @@ import (
 
 var (
 	errReadingJSONBody       = errors.New("error reading JSON body")
-	errEmailRequired         = errors.New("email is required")
+	errEmailPwdRequired      = errors.New("email and password are required")
 	errTalkingToDb           = errors.New("error talking to database")
 	errNoteIDAndVoteRequired = errors.New("note ID and vote are required")
+	errDerivingPwdHash       = errors.New("error deriving password hash")
+	errInvalidEmailPwd       = errors.New("invalid email or password")
 )
 
 func (c *apiConfig) getIndex(w http.ResponseWriter, r *http.Request) {
@@ -21,32 +24,71 @@ func (c *apiConfig) getProfile(w http.ResponseWriter, r *http.Request, user *dat
 	respondWithJSON(w, http.StatusOK, user)
 }
 
-func (c *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) {
+func (c *apiConfig) signinHandler(w http.ResponseWriter, r *http.Request) {
 	params := struct {
-		UserName string `json:"user_name"`
 		Email    string `json:"email"`
+		Password string `json:"password"`
 	}{}
-
-	// Make sure that the request contains the bearer token that authenticates
-	// it as coming from auth0's infrastructure.
-	if err := hasAuth0BearerToken(r, c.BearerToken); err != nil {
-		logAndReturn(w, http.StatusUnauthorized, err, err)
-		return
-	}
 
 	if err := marshalBodyInto(r.Body, &params); err != nil {
 		logAndReturn(w, http.StatusBadRequest, errReadingJSONBody, err)
 		return
 	}
-	if params.Email == "" {
-		logAndReturn(w, http.StatusBadRequest, errEmailRequired, nil)
+	if params.Email == "" || params.Password == "" {
+		logAndReturn(w, http.StatusBadRequest, errEmailPwdRequired, nil)
+		return
+	}
+	user, err := c.DB.GetUserByEmail(r.Context(), params.Email)
+	if errors.Is(err, sql.ErrNoRows) {
+		logAndReturn(w, http.StatusUnauthorized, errInvalidEmailPwd, err)
+		return
+	}
+	if err != nil {
+		logAndReturn(w, http.StatusInternalServerError, errTalkingToDb, err)
 		return
 	}
 
-	user, err := c.DB.CreateUser(r.Context(), database.CreateUserParams{
-		Email:    params.Email,
-		UserName: params.UserName,
-	})
+	hash, err := hashPwdWithSalt(params.Password, user.Salt)
+	if err != nil {
+		logAndReturn(w, http.StatusInternalServerError, errDerivingPwdHash, err)
+		return
+	}
+	if hash != user.PasswordHash {
+		logAndReturn(w, http.StatusUnauthorized, errInvalidEmailPwd, err)
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, user)
+}
+
+func (c *apiConfig) signupHandler(w http.ResponseWriter, r *http.Request) {
+	params := struct {
+		Email    string `json:"email"`
+		UserName string `json:"user_name"`
+		Password string `json:"password"`
+	}{}
+
+	if err := marshalBodyInto(r.Body, &params); err != nil {
+		logAndReturn(w, http.StatusBadRequest, errReadingJSONBody, err)
+		return
+	}
+	if params.Email == "" || params.Password == "" {
+		logAndReturn(w, http.StatusBadRequest, errEmailPwdRequired, nil)
+		return
+	}
+	pwdHash, salt, err := hashPwd(params.Password)
+	if err != nil {
+		logAndReturn(w, http.StatusInternalServerError, errDerivingPwdHash, err)
+		return
+	}
+
+	p := database.CreateUserParams{
+		Email:        params.Email,
+		UserName:     params.UserName,
+		PasswordHash: string(pwdHash),
+		Salt:         string(salt),
+	}
+	user, err := c.DB.CreateUser(r.Context(), p)
 	if err != nil {
 		logAndReturn(w, http.StatusInternalServerError, errTalkingToDb, err)
 		return

@@ -88,7 +88,8 @@ func main() {
 
 	// Unauthenticated endpoints.
 	router.Get("/", apiCfg.getIndex)
-	router.Post("/user", apiCfg.createUserHandler)
+	router.Post("/signin", apiCfg.signinHandler)
+	router.Post("/signup", apiCfg.signupHandler)
 	// Authenticated endpoints.
 	router.Post("/note", apiCfg.authenticate(apiCfg.createNoteHandler))
 	router.Post("/notes", apiCfg.authenticate(apiCfg.getRecentNNotesForUrl))
