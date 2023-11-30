@@ -3,7 +3,6 @@ services:
     environment:
       - DB_URL
       - ADDR
-      - AUTH0_BEARER_TOKEN
     build: .
     ports:
       - "8080:8080"

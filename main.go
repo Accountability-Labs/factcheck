@@ -18,9 +18,8 @@ import (
 var (
 	l = log.New(os.Stderr, "factcheck: ", log.Ldate|log.Ltime|log.LUTC|log.Lshortfile)
 
-	errNoAddrVar   = errors.New("environment variable ADDR unset")
-	errNoDbVar     = errors.New("environment variable DB_URL unset")
-	errNoBearerVar = errors.New("environment variable AUTH0_BEARER_TOKEN unset")
+	errNoAddrVar = errors.New("environment variable ADDR unset")
+	errNoDbVar   = errors.New("environment variable DB_URL unset")
 )
 
 type apiConfig struct {
@@ -54,12 +53,6 @@ func loadEnvVars() (*config, error) {
 		return nil, errNoDbVar
 	}
 	c.DbURL = envDbURL
-
-	bearerToken, exists := os.LookupEnv("AUTH0_BEARER_TOKEN")
-	if !exists {
-		return nil, errNoBearerVar
-	}
-	c.BearerToken = bearerToken
 
 	return c, nil
 }
