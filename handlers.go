@@ -119,6 +119,27 @@ func (c *apiConfig) createNoteHandler(w http.ResponseWriter, r *http.Request, us
 	respondWithJSON(w, http.StatusCreated, note)
 }
 
+func (c *apiConfig) getRecentNNotes(w http.ResponseWriter, r *http.Request, user *database.User) {
+	params := struct {
+		Limit int `json:"limit"`
+	}{}
+
+	if err := marshalBodyInto(r.Body, &params); err != nil {
+		logAndReturn(w, http.StatusBadRequest, errReadingJSONBody, err)
+		return
+	}
+
+	notes, err := c.DB.GetRecentNNotes(r.Context(), database.GetRecentNNotesParams{
+		VotedBy: user.ID,
+		Limit:   5,
+	})
+	if err != nil {
+		logAndReturn(w, http.StatusInternalServerError, errTalkingToDb, err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, notes)
+}
+
 func (c *apiConfig) getRecentNNotesForUrl(w http.ResponseWriter, r *http.Request, user *database.User) {
 	params := struct {
 		Url   string `json:"url"`

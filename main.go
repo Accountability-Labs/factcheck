@@ -90,6 +90,7 @@ func main() {
 	router.Post("/signin", apiCfg.signinHandler)
 	router.Post("/signup", apiCfg.signupHandler)
 	// Authenticated endpoints.
+	router.Post("/new-notes", apiCfg.authenticate(apiCfg.getRecentNNotes))
 	router.Post("/note", apiCfg.authenticate(apiCfg.createNoteHandler))
 	router.Post("/notes", apiCfg.authenticate(apiCfg.getRecentNNotesForUrl))
 	router.Post("/vote", apiCfg.authenticate(apiCfg.voteOnNote))
