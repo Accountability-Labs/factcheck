@@ -87,6 +87,7 @@ func main() {
 
 	// Unauthenticated endpoints.
 	router.Get("/", apiCfg.getIndex)
+	router.Get("/stats", apiCfg.getStats)
 	router.Post("/signin", apiCfg.signinHandler)
 	router.Post("/signup", apiCfg.signupHandler)
 	// Authenticated endpoints.

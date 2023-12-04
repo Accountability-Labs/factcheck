@@ -24,6 +24,15 @@ func (c *apiConfig) getProfile(w http.ResponseWriter, r *http.Request, user *dat
 	respondWithJSON(w, http.StatusOK, user)
 }
 
+func (c *apiConfig) getStats(w http.ResponseWriter, r *http.Request) {
+	stats, err := c.DB.GetStats(r.Context())
+	if err != nil {
+		logAndReturn(w, http.StatusInternalServerError, errTalkingToDb, err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, stats)
+}
+
 func (c *apiConfig) signinHandler(w http.ResponseWriter, r *http.Request) {
 	params := struct {
 		Email    string `json:"email"`
