@@ -23,3 +23,9 @@ SELECT users.user_name, votes.vote, notes.* FROM notes
 JOIN users ON notes.created_by = users.id
 LEFT JOIN votes ON (votes.voted_on = notes.id AND votes.voted_by = $1)
 ORDER BY notes.created_at DESC LIMIT $2;
+
+-- name: GetRecentNNotesForUser :many
+SELECT users.user_name, notes.* FROM notes
+JOIN users ON notes.created_by = users.id
+WHERE users.id = $1
+ORDER BY notes.created_at DESC LIMIT $2;
