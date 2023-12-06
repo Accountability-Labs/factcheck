@@ -11,7 +11,13 @@ var (
 )
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	jsonBlob, err := json.Marshal(payload)
+	// The JSON response body is always available via the "data" attribute.
+	wrapper := struct {
+		Data interface{} `json:"data"`
+	}{
+		Data: payload,
+	}
+	jsonBlob, err := json.Marshal(wrapper)
 	if err != nil {
 		l.Printf("Error marshalling JSON: %v", err)
 		http.Error(w, errMarshallingJSON.Error(), http.StatusInternalServerError)
