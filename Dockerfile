@@ -5,4 +5,4 @@ COPY . .
 RUN make
 EXPOSE 8080
 
-CMD ["/src/factcheck"]
+CMD ["/src/vox-backend"]

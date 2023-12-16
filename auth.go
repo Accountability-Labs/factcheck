@@ -2,9 +2,10 @@ package main
 
 import (
 	"errors"
-	"factcheck/internal/database"
 	"net/http"
 	"syscall"
+
+	"github.com/Accountability-Labs/vox-backend/internal/database"
 )
 
 const (

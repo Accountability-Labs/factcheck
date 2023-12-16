@@ -3,8 +3,9 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"factcheck/internal/database"
 	"net/http"
+
+	"github.com/Accountability-Labs/vox-backend/internal/database"
 )
 
 var (

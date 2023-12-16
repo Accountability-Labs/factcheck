@@ -1,4 +1,4 @@
-svc = factcheck
+svc = vox-backend
 deps = *.go go.mod go.sum Makefile internal/database/*.go
 
 $(svc): $(deps)

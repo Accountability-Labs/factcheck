@@ -3,10 +3,11 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"factcheck/internal/database"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/Accountability-Labs/vox-backend/internal/database"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -16,7 +17,7 @@ import (
 )
 
 var (
-	l = log.New(os.Stderr, "factcheck: ", log.Ldate|log.Ltime|log.LUTC|log.Lshortfile)
+	l = log.New(os.Stderr, "vox-backend: ", log.Ldate|log.Ltime|log.LUTC|log.Lshortfile)
 
 	errNoAddrVar = errors.New("environment variable ADDR unset")
 	errNoDbVar   = errors.New("environment variable DB_URL unset")

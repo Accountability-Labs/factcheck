@@ -1,4 +1,4 @@
-module factcheck
+module github.com/Accountability-Labs/vox-backend
 
 go 1.21.1
 

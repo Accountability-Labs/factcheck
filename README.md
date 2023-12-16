@@ -1,4 +1,4 @@
-# FactCheck backend
+# Vox backend
 
 ## Development
 
@@ -9,4 +9,4 @@
 3. Customize your `.env` file.
 4. Compile and run the service:
 
-       make && export $(cat .env | xargs) && ./factcheck
+       make && export $(cat .env | xargs) && ./vox-backend

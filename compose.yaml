@@ -1,5 +1,5 @@
 services:
-  factcheck:
+  vox-backend:
     environment:
       - DB_URL
       - ADDR
